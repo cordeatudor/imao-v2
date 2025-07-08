@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agenție Imobiliară Altfel în Arad - Consultanță & Proprietăți de Vis</title>
+  </head>
+  <body>
+    <!-- A little help for the Netlify post-processing bots -->
+    <form name="contact" netlify netlify-honeypot="bot-field" hidden>
+      <input type="text" name="name" />
+      <input type="email" name="email" />
+      <input type="tel" name="phone" />
+      <input type="text" name="subject" />
+      <textarea name="message"></textarea>
+    </form>
+    
+    <form name="sell-property" netlify netlify-honeypot="bot-field" hidden>
+      <input type="text" name="listingType" />
+      <input type="text" name="propertyType" />
+      <input type="text" name="address" />
+      <input type="text" name="size" />
+      <input type="text" name="rooms" />
+      <input type="text" name="yearBuilt" />
+      <input type="text" name="condition" />
+      <textarea name="description"></textarea>
+      <input type="text" name="name" />
+      <input type="email" name="email" />
+      <input type="tel" name="phone" />
+      <input type="text" name="preferredContact" />
+    </form>
+
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
