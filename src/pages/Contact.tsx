@@ -1,64 +1,46 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Icons from 'lucide-react';
 import TextareaAutosize from 'react-textarea-autosize';
 import SEO from '../components/SEO';
+import { useForm } from 'react-hook-form';
+import axios from 'axios';
+
+interface ContactFormData {
+  name: string;
+  email: string;
+  phone: string;
+  subject: string;
+  message: string;
+}
 
 const Contact = () => {
   const { t } = useTranslation();
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    subject: '',
-    message: ''
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setError(null);
-
-    try {
-      const form = e.target as HTMLFormElement;
-      const formData = new FormData(form);
-
-      // Submit to Netlify Forms
-      const response = await fetch('/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams(formData as any).toString()
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to submit form');
-      }
-
-      setIsSubmitted(true);
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        subject: '',
-        message: ''
-      });
-    } catch (err) {
-      console.error('Form submission error:', err);
-      setError(t('contact.form.error'));
-    } finally {
-      setIsSubmitting(false);
+  const { register, handleSubmit, reset, formState: { errors, isSubmitting, isSubmitSuccessful } } = useForm<ContactFormData>({
+    defaultValues: {
+      name: '',
+      email: '',
+      phone: '',
+      subject: '',
+      message: ''
     }
-  };
+  });
+  const [error, setError] = React.useState<string | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  const onSubmit = async (data: ContactFormData) => {
+    setError(null);
+    try {
+      await axios.post('https://imoa-backend.vercel.app/api/contact', data);
+      reset();
+    } catch (err: unknown) {
+      let errorMessage = t('contact.form.error');
+      if (axios.isAxiosError(err) && err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+      setError(errorMessage);
+    }
   };
 
   return (
@@ -83,7 +65,6 @@ const Contact = () => {
           'Servicii imobiliare premium'
         ]}
       />
-      
       {/* Hero Section */}
       <section className="bg-purple-700 text-white py-20">
         <div className="container mx-auto px-4">
@@ -97,7 +78,6 @@ const Contact = () => {
           </div>
         </div>
       </section>
-
       {/* Contact Methods */}
       <section className="py-20">
         <div className="container mx-auto px-4">
@@ -128,15 +108,13 @@ const Contact = () => {
           </div>
         </div>
       </section>
-
       {/* Contact Form Section */}
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto">
             <div className="bg-white rounded-2xl shadow-xl p-8">
               <h2 className="text-3xl font-bold mb-6">{t('contact.form.title')}</h2>
-              
-              {isSubmitted ? (
+              {isSubmitSuccessful ? (
                 <div className="text-center py-12">
                   <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Icons.CheckCircle size={32} className="text-green-500" />
@@ -149,100 +127,74 @@ const Contact = () => {
               ) : (
                 <form 
                   name="contact"
-                  method="POST"
-                  data-netlify="true"
-                  data-netlify-honeypot="bot-field"
-                  onSubmit={handleSubmit}
+                  onSubmit={handleSubmit(onSubmit)}
                   className="space-y-6"
                 >
-                  <input type="hidden" name="form-name" value="contact" />
-                  <div className="hidden">
-                    <label>
-                      Don't fill this out if you're human: <input name="bot-field" />
-                    </label>
-                  </div>
-                  
                   {error && (
                     <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">
                       {error}
                     </div>
                   )}
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       {t('contact.form.name')}
                     </label>
                     <input
                       type="text"
-                      name="name"
-                      required
-                      value={formData.name}
-                      onChange={handleChange}
+                      {...register('name', { required: t('contact.form.nameRequired') })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       placeholder={t('contact.form.namePlaceholder')}
                     />
+                    {errors.name && <span className="text-red-500 text-xs">{errors.name.message as string}</span>}
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       {t('contact.form.email')}
                     </label>
                     <input
                       type="email"
-                      name="email"
-                      required
-                      value={formData.email}
-                      onChange={handleChange}
+                      {...register('email', { required: t('contact.form.emailRequired') })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       placeholder={t('contact.form.emailPlaceholder')}
                     />
+                    {errors.email && <span className="text-red-500 text-xs">{errors.email.message as string}</span>}
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       {t('contact.form.phone')}
                     </label>
                     <input
                       type="tel"
-                      name="phone"
-                      required
-                      value={formData.phone}
-                      onChange={handleChange}
+                      {...register('phone', { required: t('contact.form.phoneRequired') })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       placeholder={t('contact.form.phonePlaceholder')}
                     />
+                    {errors.phone && <span className="text-red-500 text-xs">{errors.phone.message as string}</span>}
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       {t('contact.form.subject')}
                     </label>
                     <input
                       type="text"
-                      name="subject"
-                      required
-                      value={formData.subject}
-                      onChange={handleChange}
+                      {...register('subject', { required: t('contact.form.subjectRequired') })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       placeholder={t('contact.form.subjectPlaceholder')}
                     />
+                    {errors.subject && <span className="text-red-500 text-xs">{errors.subject.message as string}</span>}
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       {t('contact.form.message')}
                     </label>
                     <TextareaAutosize
-                      name="message"
-                      required
-                      value={formData.message}
-                      onChange={handleChange}
+                      {...register('message', { required: t('contact.form.messageRequired') })}
                       minRows={4}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
                       placeholder={t('contact.form.messagePlaceholder')}
                     />
+                    {errors.message && <span className="text-red-500 text-xs">{errors.message.message as string}</span>}
                   </div>
-
                   <button
                     type="submit"
                     disabled={isSubmitting}
