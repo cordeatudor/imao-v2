@@ -267,38 +267,6 @@ const PropertyDetails = () => {
                 </button>
               </form>
 
-              <div className="mt-8 pt-8 border-t">
-                <h3 className="text-xl font-bold mb-4">Contact agent</h3>
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-16 h-16 bg-gray-200 rounded-full overflow-hidden">
-                    <img
-                      src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1974&auto=format&fit=crop"
-                      alt="Agent imobiliar"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <div className="font-semibold">Alexandru Popescu</div>
-                    <div className="text-gray-600">Agent imobiliar senior</div>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <a
-                    href="tel:+40371236023"
-                    className="flex items-center gap-2 text-gray-600 hover:text-purple-600"
-                  >
-                    <Icons.Phone size={20} />
-                    +40 371 236 023
-                  </a>
-                  <a
-                    href="mailto:alex@altfel.ro"
-                    className="flex items-center gap-2 text-gray-600 hover:text-purple-600"
-                  >
-                    <Icons.Mail size={20} />
-                    alex@altfel.ro
-                  </a>
-                </div>
-              </div>
             </div>
           </div>
         </div>
